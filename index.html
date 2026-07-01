@@ -1,796 +1,340 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nova Browser</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0d0d0f;
-    --surface: #16161a;
-    --surface2: #1e1e24;
-    --border: #2a2a35;
-    --accent: #6c63ff;
-    --accent2: #ff6584;
-    --accent3: #43e97b;
-    --text: #e8e8f0;
-    --text-dim: #7878a0;
-    --tab-active: #1e1e2e;
-    --tab-hover: #18181f;
-    --shadow: 0 8px 32px rgba(0,0,0,0.4);
-    --radius: 10px;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAFC NEWS</title>
+    <style>
+        :root {
+            --bg-color: #060b16;
+            --card-bg: #0f172a;
+            --neon-green: #00ff66;
+            --neon-gold: #ffc200;
+            --border-color: #1e293b;
+            --text-color: #ffffff;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: linear-gradient(180deg, #0f172a 0%, #060b16 100%);
+            text-align: center;
+            padding: 25px 10px;
+            border-bottom: 2px solid var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+            letter-spacing: 2px;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+        header p {
+            margin: 5px 0 0 0;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .main-container {
+            display: flex;
+            max-width: 1300px;
+            margin: 25px auto;
+            gap: 25px;
+            padding: 0 20px;
+        }
+        /* News Section (Pastga surib ko'riladi) */
+        .news-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        .news-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        .news-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--neon-gold);
+        }
+        .news-img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .news-content {
+            padding: 20px;
+        }
+        .news-content h2 {
+            margin: 0 0 10px 0;
+            color: var(--neon-gold);
+            font-size: 24px;
+        }
+        .news-content p {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+        .news-content .date {
+            color: #64748b;
+            font-size: 12px;
+        }
+        /* Database Section (Faqat Card rasmlari) */
+        .database-section {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            align-self: flex-start;
+        }
+        .database-section h3 {
+            margin: 0 0 15px 0;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(0,255,102,0.3);
+            font-size: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .grid-database {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+            max-height: 700px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .grid-database::-webkit-scrollbar { width: 5px; }
+        .grid-database::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        .card-img-item {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+        .card-img-item:hover { transform: scale(1.05); }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* MAXFIY ADMIN PANEL MODAL OYNASI */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(6, 11, 22, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+        .admin-box {
+            background: var(--card-bg);
+            border: 2px solid var(--neon-green);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 550px;
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.3);
+            box-sizing: border-box;
+            margin: 20px auto;
+        }
+        .admin-box h2 { color: var(--neon-green); text-align: center; margin-top: 0; }
+        .admin-box h3 { color: var(--neon-gold); border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; color: #94a3b8; }
+        input[type="text"], textarea {
+            width: 100%; padding: 10px; background: #060b16; border: 1px solid var(--border-color); color: white; border-radius: 6px; box-sizing: border-box;
+        }
+        .btn-panel {
+            width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px;
+        }
+        .btn-green { background: var(--neon-green); color: #000; }
+        .btn-gold { background: var(--neon-gold); color: #000; margin-top: 15px; }
+        .close-btn { background: #ef4444; color: white; margin-top: 15px; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    user-select: none;
-  }
+        /* Pastdagi maxfiy tugma */
+        footer {
+            text-align: center;
+            padding: 30px 10px;
+            background: #0f172a;
+            margin-top: 50px;
+            border-top: 1px solid var(--border-color);
+        }
+        .secret-admin-btn {
+            background: transparent; color: #334155; border: none; font-size: 11px; cursor: pointer; text-decoration: underline;
+        }
+        .secret-admin-btn:hover { color: var(--neon-green); }
 
-  /* ── TOP CHROME ── */
-  #chrome {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-  }
-
-  /* Tab bar */
-  #tab-bar {
-    display: flex;
-    align-items: center;
-    padding: 8px 8px 0;
-    gap: 4px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  #tab-bar::-webkit-scrollbar { display: none; }
-
-  .tab {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 8px 8px 0 0;
-    background: var(--surface2);
-    border: 1px solid transparent;
-    border-bottom: none;
-    min-width: 140px;
-    max-width: 200px;
-    cursor: pointer;
-    font-size: 12.5px;
-    color: var(--text-dim);
-    transition: all 0.2s;
-    position: relative;
-    flex-shrink: 0;
-  }
-  .tab.active {
-    background: var(--tab-active);
-    border-color: var(--border);
-    color: var(--text);
-  }
-  .tab:hover:not(.active) { background: var(--tab-hover); color: var(--text); }
-
-  .tab-favicon {
-    width: 14px; height: 14px;
-    border-radius: 3px;
-    flex-shrink: 0;
-    object-fit: contain;
-  }
-  .tab-title {
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 12px;
-  }
-  .tab-close {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--text-dim);
-    font-size: 14px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.15s;
-    line-height: 1;
-  }
-  .tab-close:hover { background: rgba(255,100,100,0.2); color: #ff6666; }
-
-  #new-tab-btn {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    cursor: pointer;
-    font-size: 18px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.15s;
-    margin-bottom: 0;
-    align-self: center;
-  }
-  #new-tab-btn:hover { background: var(--surface2); color: var(--text); }
-
-  /* Nav bar */
-  #nav-bar {
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    gap: 8px;
-  }
-
-  .nav-btn {
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-    cursor: pointer;
-    font-size: 16px;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-    flex-shrink: 0;
-  }
-  .nav-btn:hover:not(:disabled) { background: var(--surface2); color: var(--text); }
-  .nav-btn:disabled { opacity: 0.3; cursor: default; }
-
-  #url-bar-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0 12px;
-    gap: 8px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  #url-bar-wrap:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
-  }
-
-  #lock-icon { font-size: 13px; color: var(--accent3); flex-shrink: 0; }
-
-  #url-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13.5px;
-    padding: 7px 0;
-    min-width: 0;
-  }
-  #url-input::placeholder { color: var(--text-dim); }
-
-  #go-btn {
-    background: var(--accent);
-    border: none;
-    border-radius: 6px;
-    color: white;
-    padding: 5px 14px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: all 0.15s;
-  }
-  #go-btn:hover { background: #7c74ff; }
-
-  /* Progress bar */
-  #progress-bar {
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    width: 0%;
-    transition: width 0.3s ease;
-    border-radius: 0 2px 2px 0;
-  }
-
-  /* ── CONTENT AREA ── */
-  #content-area {
-    flex: 1;
-    display: flex;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .frame-wrapper {
-    position: absolute;
-    inset: 0;
-    display: none;
-  }
-  .frame-wrapper.active { display: flex; flex-direction: column; }
-
-  iframe {
-    flex: 1;
-    border: none;
-    background: white;
-  }
-
-  /* ── NEW TAB PAGE ── */
-  .newtab-page {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
-    background: var(--bg);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .newtab-page::before {
-    content: '';
-    position: absolute;
-    width: 600px; height: 600px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(108,99,255,0.08) 0%, transparent 70%);
-    top: 50%; left: 50%;
-    transform: translate(-50%, -60%);
-    pointer-events: none;
-  }
-
-  .newtab-brand {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 48px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -1px;
-  }
-
-  .newtab-search-wrap {
-    display: flex;
-    align-items: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 0 20px;
-    gap: 10px;
-    width: 480px;
-    max-width: 90vw;
-    box-shadow: var(--shadow);
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .newtab-search-wrap:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 4px rgba(108,99,255,0.12), var(--shadow);
-  }
-
-  .newtab-search-icon { font-size: 18px; color: var(--text-dim); }
-
-  .newtab-search {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    padding: 16px 0;
-  }
-  .newtab-search::placeholder { color: var(--text-dim); }
-
-  .quick-links {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 520px;
-  }
-
-  .quick-link {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-  .quick-link:hover { transform: translateY(-3px); }
-
-  .quick-link-icon {
-    width: 52px; height: 52px;
-    border-radius: 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  }
-
-  .quick-link-label {
-    font-size: 11px;
-    color: var(--text-dim);
-    font-weight: 500;
-  }
-
-  /* ── BLOCKED PAGE ── */
-  .blocked-page {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    text-align: center;
-    padding: 40px;
-    background: var(--bg);
-  }
-  .blocked-icon { font-size: 56px; }
-  .blocked-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 22px;
-  }
-  .blocked-msg { color: var(--text-dim); font-size: 14px; max-width: 400px; line-height: 1.6; }
-  .blocked-open-btn {
-    margin-top: 8px;
-    background: var(--accent);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    padding: 10px 24px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .blocked-open-btn:hover { background: #7c74ff; }
-
-  /* Status bar */
-  #status-bar {
-    height: 20px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    gap: 16px;
-    flex-shrink: 0;
-  }
-  .status-item {
-    font-size: 10.5px;
-    color: var(--text-dim);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .status-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent3);
-  }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-</style>
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .database-section { align-self: stretch; }
+        }
+    </style>
 </head>
 <body>
 
-<div id="chrome">
-  <!-- Tab bar -->
-  <div id="tab-bar">
-    <button id="new-tab-btn" title="Yangi tab" onclick="newTab()">+</button>
-  </div>
+    <header>
+        <h1>EAFC NEWS</h1>
+        <p>Rasmiy Yangiliklar Tasmasi va Eksklyuziv Kartalar Database Markazi</p>
+    </header>
 
-  <!-- Nav bar -->
-  <div id="nav-bar">
-    <button class="nav-btn" id="btn-back" title="Orqaga" onclick="goBack()" disabled>&#8592;</button>
-    <button class="nav-btn" id="btn-fwd" title="Oldinga" onclick="goForward()" disabled>&#8594;</button>
-    <button class="nav-btn" title="Yangilash" onclick="reload()">&#8635;</button>
-    <button class="nav-btn" title="Uy sahifasi" onclick="goHome()">&#8962;</button>
+    <div class="main-container">
+        <!-- YANGILIKLAR BO'LIMI -->
+        <div class="news-section" id="newsFeed"></div>
 
-    <div id="url-bar-wrap">
-      <span id="lock-icon">🔒</span>
-      <input id="url-input" type="text" placeholder="Manzil yoki qidiruv..."
-        onkeydown="urlKeydown(event)" onfocus="this.select()" />
-      <button id="go-btn" onclick="navigate()">Borish</button>
+        <!-- DATABASE BO'LIMI -->
+        <div class="database-section">
+            <h3>🗂️ KARTALAR DATABASE</h3>
+            <div class="grid-database" id="databaseGrid"></div>
+        </div>
     </div>
 
-    <button class="nav-btn" title="Sozlamalar" onclick="alert('Sozlamalar tez orada!')">⚙</button>
-  </div>
-
-  <div id="progress-bar"></div>
-</div>
-
-<!-- Content -->
-<div id="content-area"></div>
-
-<!-- Status bar -->
-<div id="status-bar">
-  <div class="status-item"><div class="status-dot"></div> Nova Browser</div>
-  <div class="status-item" id="status-url"></div>
-  <div class="status-item" id="status-time"></div>
-</div>
-
-<script>
-  // ── State ──
-  let tabs = [];
-  let activeTabId = null;
-  let tabCounter = 0;
-
-  const QUICK_LINKS = [
-    { label: 'Google', emoji: '🔍', url: 'https://google.com' },
-    { label: 'YouTube', emoji: '▶️', url: 'https://youtube.com' },
-    { label: 'Wikipedia', emoji: '📖', url: 'https://wikipedia.org' },
-    { label: 'GitHub', emoji: '💻', url: 'https://github.com' },
-    { label: 'Twitter', emoji: '🐦', url: 'https://twitter.com' },
-    { label: 'Reddit', emoji: '👽', url: 'https://reddit.com' },
-  ];
-
-  // Sites known to block iframes
-  const BLOCKED_DOMAINS = [
-    'google.com', 'youtube.com', 'twitter.com', 'facebook.com',
-    'instagram.com', 'reddit.com', 'github.com', 'wikipedia.org',
-    'amazon.com', 'netflix.com', 'tiktok.com', 'linkedin.com'
-  ];
-
-  function isBlocked(url) {
-    try {
-      const host = new URL(url).hostname.replace('www.', '');
-      return BLOCKED_DOMAINS.some(d => host === d || host.endsWith('.' + d));
-    } catch { return false; }
-  }
-
-  function isUrl(str) {
-    return /^(https?:\/\/|www\.)/i.test(str) || /^[a-z0-9-]+\.[a-z]{2,}/i.test(str);
-  }
-
-  function normalizeUrl(str) {
-    str = str.trim();
-    if (!str) return null;
-    if (isUrl(str)) {
-      if (!/^https?:\/\//i.test(str)) str = 'https://' + str;
-      return str;
-    }
-    return 'https://www.google.com/search?q=' + encodeURIComponent(str);
-  }
-
-  function getTabById(id) { return tabs.find(t => t.id === id); }
-
-  // ── Tab rendering ──
-  function renderTabs() {
-    const bar = document.getElementById('tab-bar');
-    // Remove old tabs
-    bar.querySelectorAll('.tab').forEach(el => el.remove());
-
-    tabs.forEach(tab => {
-      const el = document.createElement('div');
-      el.className = 'tab' + (tab.id === activeTabId ? ' active' : '');
-      el.dataset.id = tab.id;
-
-      el.innerHTML = `
-        <span class="tab-favicon">${tab.favicon || '🌐'}</span>
-        <span class="tab-title">${escHtml(tab.title)}</span>
-        <button class="tab-close" title="Yopish">×</button>
-      `;
-
-      el.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('tab-close')) switchTab(tab.id);
-      });
-      el.querySelector('.tab-close').addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeTab(tab.id);
-      });
-
-      bar.insertBefore(el, document.getElementById('new-tab-btn'));
-    });
-  }
-
-  function renderFrames() {
-    const area = document.getElementById('content-area');
-    // Remove frames for deleted tabs
-    area.querySelectorAll('.frame-wrapper').forEach(fw => {
-      if (!tabs.find(t => t.id == fw.dataset.id)) fw.remove();
-    });
-
-    tabs.forEach(tab => {
-      let fw = area.querySelector(`.frame-wrapper[data-id="${tab.id}"]`);
-      if (!fw) {
-        fw = document.createElement('div');
-        fw.className = 'frame-wrapper';
-        fw.dataset.id = tab.id;
-        area.appendChild(fw);
-      }
-      fw.className = 'frame-wrapper' + (tab.id === activeTabId ? ' active' : '');
-    });
-
-    updateFrameContent();
-  }
-
-  function updateFrameContent() {
-    const tab = getTabById(activeTabId);
-    if (!tab) return;
-
-    const area = document.getElementById('content-area');
-    const fw = area.querySelector(`.frame-wrapper[data-id="${activeTabId}"]`);
-    if (!fw) return;
-
-    if (!tab.url) {
-      // New tab page
-      fw.innerHTML = newTabPageHTML();
-      fw.querySelector('.newtab-search').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          const val = e.target.value.trim();
-          if (val) loadUrl(normalizeUrl(val));
-        }
-      });
-    } else if (tab.blocked) {
-      fw.innerHTML = blockedPageHTML(tab.url, tab.title);
-    } else if (!fw.querySelector('iframe')) {
-      const iframe = document.createElement('iframe');
-      iframe.src = tab.url;
-      iframe.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox';
-      iframe.addEventListener('load', () => {
-        try {
-          const title = iframe.contentDocument?.title;
-          if (title) updateTabTitle(activeTabId, title);
-        } catch(e) {}
-        setProgress(100);
-        setTimeout(() => setProgress(0), 600);
-      });
-      fw.innerHTML = '';
-      fw.appendChild(iframe);
-    }
-
-    // Update url bar
-    document.getElementById('url-input').value = tab.url || '';
-    document.getElementById('lock-icon').textContent = (tab.url || '').startsWith('https') ? '🔒' : '🌐';
-    document.getElementById('status-url').textContent = tab.url ? new URL(tab.url).hostname : '';
-    updateNavBtns();
-  }
-
-  function newTabPageHTML() {
-    return `
-      <div class="newtab-page">
-        <div class="newtab-brand">Nova</div>
-        <div class="newtab-search-wrap">
-          <span class="newtab-search-icon">🔍</span>
-          <input class="newtab-search" type="text" placeholder="Qidirish yoki manzil kiriting..." autofocus />
-        </div>
-        <div class="quick-links">
-          ${QUICK_LINKS.map(l => `
-            <div class="quick-link" onclick="loadUrl('${l.url}')">
-              <div class="quick-link-icon">${l.emoji}</div>
-              <div class="quick-link-label">${l.label}</div>
+    <!-- INTEGRATSIYA QILINGAN MODAL ADMIN PANEL -->
+    <div class="admin-modal" id="adminModal">
+        <div class="admin-box">
+            <h2>⚡ ADMIN PANEL</h2>
+            
+            <!-- YANGILIK QO'SHISH -->
+            <h3>📰 Yangi Yangilik Qo'shish</h3>
+            <div class="form-group">
+                <label>Sarlavha</label>
+                <input type="text" id="newsTitle" placeholder="Oltin To'p Favoriti Belgilandi!">
             </div>
-          `).join('')}
+            <div class="form-group">
+                <label>Maqola Matni</label>
+                <textarea id="newsText" rows="4" placeholder="Tafsilotlarni to'liq yozing..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Yangilik Rasmi</label>
+                <input type="file" id="newsImage" accept="image/*">
+            </div>
+            <button class="btn-panel btn-green" onclick="saveNews()">SAYTGA CHIQARISH</button>
+
+            <!-- KARTA QO'SHISH -->
+            <h3>🗂️ Karta Qo'shish (Faqat Rasm)</h3>
+            <div class="form-group">
+                <label>O'yinchi Karta Rasmi</label>
+                <input type="file" id="cardImage" accept="image/*">
+            </div>
+            <button class="btn-panel btn-gold" onclick="saveCard()">KARTANI DATABASEGA QO'SHISH</button>
+
+            <button class="btn-panel close-btn" onclick="closeAdmin()">Panelni Yopish</button>
         </div>
-      </div>
-    `;
-  }
+    </div>
 
-  function blockedPageHTML(url, title) {
-    return `
-      <div class="blocked-page">
-        <div class="blocked-icon">🔗</div>
-        <div class="blocked-title">${escHtml(title || 'Bu sayt')}</div>
-        <div class="blocked-msg">
-          Bu sayt iframe orqali ko'rsatilishni taqiqlagan.<br>
-          Uni to'liq brauzerda ochishingiz mumkin.
-        </div>
-        <a class="blocked-open-btn" href="${escHtml(url)}" target="_blank" rel="noopener">
-          Yangi oynada ochish ↗
-        </a>
-      </div>
-    `;
-  }
+    <footer>
+        <p style="margin: 0 0 10px 0; color: #64748b; font-size: 13px;">&copy; 2026 EAFC NEWS. Barcha huquqlar himoyalangan.</p>
+        <!-- MAXFIY ADMIN TUGMASI -->
+        <button class="secret-admin-btn" onclick="openAdmin()">System Login (Admin)</button>
+    </footer>
 
-  // ── Tab management ──
-  function newTab(url) {
-    const id = ++tabCounter;
-    tabs.push({ id, url: url || null, title: url ? 'Yuklanmoqda...' : 'Yangi tab', favicon: '🌐', history: url ? [url] : [], histIdx: url ? 0 : -1, blocked: false });
-    activeTabId = id;
-    renderTabs();
-    renderFrames();
-    if (url) {
-      setProgress(30);
-      checkAndLoad(id, url);
-    }
-    if (!url) document.getElementById('url-input').value = '';
-  }
+    <script>
+        const ADMIN_PIN = "7777"; // Kirish paroli
 
-  function switchTab(id) {
-    activeTabId = id;
-    renderTabs();
-    updateFrameContent();
-  }
+        // Ma'lumotlarni render qilish
+        function loadEAFCData() {
+            const newsData = JSON.parse(localStorage.getItem('eafc_news')) || [];
+            const cardsData = JSON.parse(localStorage.getItem('eafc_cards')) || [];
 
-  function closeTab(id) {
-    const idx = tabs.findIndex(t => t.id === id);
-    tabs.splice(idx, 1);
-    if (tabs.length === 0) { newTab(); return; }
-    if (activeTabId === id) {
-      activeTabId = tabs[Math.min(idx, tabs.length - 1)].id;
-    }
-    const area = document.getElementById('content-area');
-    const fw = area.querySelector(`.frame-wrapper[data-id="${id}"]`);
-    if (fw) fw.remove();
-    renderTabs();
-    updateFrameContent();
-  }
+            const newsFeed = document.getElementById('newsFeed');
+            const databaseGrid = document.getElementById('databaseGrid');
 
-  function updateTabTitle(id, title) {
-    const tab = getTabById(id);
-    if (tab) { tab.title = title; renderTabs(); }
-  }
+            if(newsData.length === 0) {
+                newsFeed.innerHTML = '<div style="text-align:center; padding:50px; color:#64748b;">Hozircha hech qanday yangilik joylanmagan.</div>';
+            } else {
+                newsFeed.innerHTML = newsData.map(item => `
+                    <div class="news-item">
+                        ${item.image ? `<img src="${item.image}" class="news-img" alt="news">` : ''}
+                        <div class="news-content">
+                            <h2>${item.title}</h2>
+                            <p>${item.text}</p>
+                            <div class="date">Sana: ${item.date}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
 
-  // ── Navigation ──
-  function loadUrl(url) {
-    const tab = getTabById(activeTabId);
-    if (!tab) return;
-    tab.url = url;
-    tab.title = 'Yuklanmoqda...';
-    tab.blocked = false;
+            if(cardsData.length === 0) {
+                databaseGrid.innerHTML = '<div style="color:#64748b; text-align:center; padding:20px;">Baza boʻsh.</div>';
+            } else {
+                databaseGrid.innerHTML = cardsData.map(imgSrc => `
+                    <img src="${imgSrc}" class="card-img-item" alt="EAFC Card">
+                `).join('');
+            }
+        }
 
-    // Push history
-    tab.history = tab.history.slice(0, tab.histIdx + 1);
-    tab.history.push(url);
-    tab.histIdx = tab.history.length - 1;
+        // Admin panelni ochish (Parol so'raydi)
+        function openAdmin() {
+            const pass = prompt("Xavfsizlik tizimi! Admin PIN-kodni kiriting:");
+            if (pass === ADMIN_PIN) {
+                document.getElementById('adminModal').style.display = 'flex';
+            } else if (pass !== null) {
+                alert("PIN-kod noto'g'ri!");
+            }
+        }
 
-    renderTabs();
-    setProgress(30);
-    checkAndLoad(activeTabId, url);
-  }
+        function closeAdmin() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
 
-  function checkAndLoad(tabId, url) {
-    const tab = getTabById(tabId);
-    if (!tab) return;
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
 
-    if (isBlocked(url)) {
-      try { tab.title = new URL(url).hostname; } catch(e) { tab.title = url; }
-      tab.blocked = true;
-      setProgress(100);
-      setTimeout(() => setProgress(0), 400);
-      renderTabs();
-      updateFrameContent();
-      return;
-    }
+        // Yangilik saqlash
+        async function saveNews() {
+            const title = document.getElementById('newsTitle').value;
+            const text = document.getElementById('newsText').value;
+            const imgFile = document.getElementById('newsImage').files[0];
+            const date = new Date().toLocaleString('uz-UZ');
 
-    // Load via iframe
-    tab.blocked = false;
-    const area = document.getElementById('content-area');
-    let fw = area.querySelector(`.frame-wrapper[data-id="${tabId}"]`);
-    if (!fw) return;
-    fw.innerHTML = '';
+            if(!title || !text) return alert("Sarlavha va matn majburiy!");
 
-    const iframe = document.createElement('iframe');
-    iframe.src = url;
-    iframe.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox';
+            let imageBase64 = "";
+            if(imgFile) imageBase64 = await getBase64(imgFile);
 
-    iframe.addEventListener('load', () => {
-      try {
-        const t = iframe.contentDocument?.title;
-        if (t) { tab.title = t; renderTabs(); }
-        else { try { tab.title = new URL(url).hostname; } catch(e){} renderTabs(); }
-      } catch(e) {
-        try { tab.title = new URL(url).hostname; } catch(e2){}
-        renderTabs();
-      }
-      setProgress(100);
-      setTimeout(() => setProgress(0), 600);
-    });
+            const newsList = JSON.parse(localStorage.getItem('eafc_news')) || [];
+            newsList.unshift({ title, text, image: imageBase64, date });
+            localStorage.setItem('eafc_news', JSON.stringify(newsList));
 
-    iframe.addEventListener('error', () => {
-      tab.blocked = true;
-      try { tab.title = new URL(url).hostname; } catch(e) {}
-      renderTabs();
-      fw.innerHTML = blockedPageHTML(url, tab.title);
-      setProgress(0);
-    });
+            alert("Yangilik qo'shildi!");
+            loadEAFCData(); // Sahifani kodni yangilamasdan yurgizish
+            
+            document.getElementById('newsTitle').value = "";
+            document.getElementById('newsText').value = "";
+            document.getElementById('newsImage').value = "";
+        }
 
-    fw.appendChild(iframe);
-    document.getElementById('url-input').value = url;
-    document.getElementById('lock-icon').textContent = url.startsWith('https') ? '🔒' : '🌐';
-    document.getElementById('status-url').textContent = (() => { try { return new URL(url).hostname; } catch(e) { return ''; } })();
-    updateNavBtns();
-  }
+        // Karta saqlash
+        async function saveCard() {
+            const cardFile = document.getElementById('cardImage').files[0];
+            if(!cardFile) return alert("Karta rasmini yuklang!");
 
-  function navigate() {
-    const raw = document.getElementById('url-input').value.trim();
-    if (!raw) return;
-    const url = normalizeUrl(raw);
-    if (url) loadUrl(url);
-  }
+            const cardBase64 = await getBase64(cardFile);
 
-  function urlKeydown(e) {
-    if (e.key === 'Enter') navigate();
-  }
+            const cardsList = JSON.parse(localStorage.getItem('eafc_cards')) || [];
+            cardsList.unshift(cardBase64);
+            localStorage.setItem('eafc_cards', JSON.stringify(cardsList));
 
-  function goBack() {
-    const tab = getTabById(activeTabId);
-    if (!tab || tab.histIdx <= 0) return;
-    tab.histIdx--;
-    const url = tab.history[tab.histIdx];
-    tab.url = url;
-    tab.blocked = false;
-    renderTabs();
-    setProgress(30);
-    checkAndLoad(activeTabId, url);
-  }
+            alert("Karta databasega qo'shildi!");
+            loadEAFCData();
+            document.getElementById('cardImage').value = "";
+        }
 
-  function goForward() {
-    const tab = getTabById(activeTabId);
-    if (!tab || tab.histIdx >= tab.history.length - 1) return;
-    tab.histIdx++;
-    const url = tab.history[tab.histIdx];
-    tab.url = url;
-    tab.blocked = false;
-    renderTabs();
-    setProgress(30);
-    checkAndLoad(activeTabId, url);
-  }
-
-  function reload() {
-    const tab = getTabById(activeTabId);
-    if (!tab || !tab.url) return;
-    setProgress(20);
-    checkAndLoad(activeTabId, tab.url);
-  }
-
-  function goHome() {
-    const tab = getTabById(activeTabId);
-    if (!tab) return;
-    tab.url = null;
-    tab.title = 'Yangi tab';
-    tab.blocked = false;
-    renderTabs();
-    updateFrameContent();
-    document.getElementById('url-input').value = '';
-  }
-
-  function updateNavBtns() {
-    const tab = getTabById(activeTabId);
-    document.getElementById('btn-back').disabled = !tab || tab.histIdx <= 0;
-    document.getElementById('btn-fwd').disabled = !tab || tab.histIdx >= (tab.history || []).length - 1;
-  }
-
-  // ── Progress ──
-  function setProgress(pct) {
-    const bar = document.getElementById('progress-bar');
-    bar.style.width = pct + '%';
-  }
-
-  // ── Helpers ──
-  function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // ── Clock ──
-  function updateClock() {
-    const now = new Date();
-    document.getElementById('status-time').textContent =
-      now.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
-
-  // ── Init ──
-  newTab();
-</script>
+        window.onload = loadEAFCData;
+    </script>
 </body>
 </html>
